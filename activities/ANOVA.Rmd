@@ -1,7 +1,8 @@
 ---
 title: "ANOVA for Journalists: Analyzing College Admissions Test Scores"
-date: 8-22-2025
+date: 11-3-2025
 ---
+Ryan Bowie
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
@@ -60,10 +61,16 @@ admission_summary <- admissions_data |>
 print(admission_summary)
 ```
 
+Context: Fall 2024 midpoint SAT for University of Maryland was 1,465.
+
+
 **Task 3** Describe the data
 
 Write a couple of sentences describing the differences in SAT scores between types of colleges, using the descriptive statistics we just generated.
 
+
+**Task 3: Write your answer here:**
+The scores in private colleges are far higher than the other two in terms of average, shown in mean, and the number of students that performed well, which is shown by the lower standard deviation. In addition, the lowest score that a private school student had was slightly over 1200, which is also a higher minimum score than the other three, further explaining the lower standard deviation as well.
 
 
 ## Task 4: Visualize the Data
@@ -108,6 +115,29 @@ summary(anova_result)
 
 The F-value is huge (284.3). The F-value measures the ratio of between-group variance to within-group variance, and this high value suggests the differences between college types far outweigh the variation within each type. The p-value is very low, indicating the differences between college types are statistically significant at any reasonable significance level. The three asterisks (***) highlight that this is significant at the 0.001 level. So we can say that with confidence that there are real differences in SAT scores between the three types of colleges.
 
+How do we know the F-value is huge?
+We can calculate the critical value for an F statistic by using the qf() function in R
+
+```{r}
+# Your ANOVA has:
+# df1 (between groups) = 2
+# df2 (within groups/residuals) = 297
+# Common alpha levels: 0.05, 0.01, 0.001
+
+# Critical values at different significance levels:
+critical_f_05 <- qf(0.95, df1 = 2, df2 = 297)
+critical_f_01 <- qf(0.99, df1 = 2, df2 = 297)
+critical_f_001 <- qf(0.999, df1 = 2, df2 = 297)
+
+cat("Here are the Critical F-values:\n")
+cat("alpha of α = 0.05: ", round(critical_f_05, 3), "\n")
+cat("alpha of α = 0.01: ", round(critical_f_01, 3), "\n")
+cat("alpha ofα = 0.001:", round(critical_f_001, 3), "\n")
+cat("The F-statistic is: 284.3\n")
+cat("Ratio to most extreme critical value (α=0.001) to the F statistic:", round(284.3/critical_f_001, 1), "x\n")
+```
+
+
 ## Task 5: Compare the differences between specific pairs
 
 ```{r post-hoc}
@@ -133,4 +163,12 @@ Based on our analysis, we can now answer:
 3. How large are these differences?
 
 Answer those questions, providing evidence for your answers, and then write a headline and a lead paragraph reporting these findings using active voice and focusing on the differences across types.
+
+1. Yes, all have p-values that exceed the alpha value of 0.05.
+2. Private colleges have the highest scores and the largest differences between the other two college types. They have the highest upper bound and highest lower bound, along with the highest difference by average in comparison to Community and Public colleges.
+3. Private colleges have the largest positive difference from Community colleges as they have the highest scores by far. Public colleges have the highest negative difference from Private colleges, meaning that Public colleges are 74 points lower than Private colleges on average.
+
+Headline: Scores in Private Schools Exceed Scores in Other College Types by Large Margin. 
+
+Lead: Private schools in Blank County outperformed other community and public schools in the region. Statistics show that there was higher average scores and more consistent performance in the private education sector.
 

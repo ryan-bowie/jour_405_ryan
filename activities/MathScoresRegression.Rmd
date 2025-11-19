@@ -1,7 +1,8 @@
 
 ---
 title: "Activity: Linear Regression "
-date: 8-24-2025
+date: 11-17-2025
+Ryan Bowie
 ---
 
 ```{r}
@@ -27,7 +28,7 @@ schools <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/ref
 ```
 ### Task: Create a Scatterplot and Describe the Results (2 points)
 
-Next, let's create a scatterplot to visualize the relationship between the FARMS percentage and the percentage of students who met or exceeded math expectations. We'll use ggplot2 to create the plot and add a linear regression line.
+Next, let's create a scatterplot to visualize the relationship between the FARMS  (Free and Reduced-price Meal System) percentage and the percentage of students who met or exceeded math expectations. We'll use ggplot2 to create the plot and add a linear regression line.
 
 ```{r}
 schools |>
@@ -39,7 +40,8 @@ schools |>
 
 The scatterplot shows the overall trend of the relationship between the FARMS percentage and the math test scores. The red line represents the linear regression line, which helps us understand the average relationship between the two variables. Based on what you see here, what's the relationship between FARMS percentage and math test scores?
 
-ANSWER HERE
+**WRITE YOUR ANSWER HERE**
+There isn't much of a correlation between FARMS percentage and test scores. The data points aren't strongly bunched together on the line of regression, indicating that the correlation isn't a strong one. However, the correlation is positive and perhaps with more data there could be a more definitive answer on how significant the relationship between FARMS percentage and test scores really is.
 
 
 ### Task: Linear Regression Model (3 points)
@@ -58,7 +60,9 @@ In the middle, you can see the (Intercept) is 59.57897 and the FARMS coefficient
 
 Based on what you've learned so far, is this model worth using? What does it tell us about the nature of the relationship between FARMS percentage and math scores?
 
-ANSWER HERE
+**WRITE ANSWER HERE**
+The relationship between FARMS percentage and math scores is not statistically significant because the p-value is only significant at the 0 level, not at the 0.05 level. Because the p-value is not statistically significant, using this model wouldn't help much.
+
 
 ### Task: Identifying Schools with Biggest Residuals (2 points)
 
@@ -83,10 +87,13 @@ schools <- schools |>
 ```
 The schools with the biggest positive residuals are performing better than expected, while the schools with the biggest negative residuals are performing worse than expected, based on their FARMS percentage. Look at the absolute values of the residuals; what are the largest differences between the predicted result and the actual math scores?
 
-ANSWER HERE
+**WRITE YOUR ANSWER HERE**
+The results with higher residuals yield less accurate results in reference to predicted results and actual scores. For example, White Marsh Elementary had a predicted score of 71.9 and an actual score of 26.1. The residual for this entry was 45.8, a very high residual leading to an inaccurate result. Evans Elementary School had a predicted score of 62 and an actual score of 61.5. Since the residual value was less than 1, it indicates less variance between the predicted and actual scores, giving an accurate representation of the relationship.
 
 ## Task: Evaluate the model (3 points)
 
 A school board member has said at a meeting that elementary schools with fewer students on free and reduced price meals do better on standardized math tests. Describe what conclusions you'd draw from this model's results and how it would influence a story pitch about the school board member and math scores.
 
-ANSWER HERE
+**WRITE YOUR ANSWER HERE**
+
+I would draw the conclusion that this statement would be inaccurate given the data presented. The original linear regression graph showed a weak positive correlation between the relationship, meaning that it would hard to definitively tell that there is a relationship between fewer students on free meals and test scores. I would present this data to the school board along with the chart showing the residuals that indicate why the relationship isn't strong enough to draw a final conclusion.

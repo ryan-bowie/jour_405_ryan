@@ -22,7 +22,7 @@ billboard <- read_csv("billboard.csv")
 
 billboard_simple <- billboard |>
   select(Song, Artist, Date, `Weeks at Number One`) |>
-  arrange(Date) #did not work, trying to get songs in chronological order in table since sorting isn't working either
+  arrange(Date)
     
 
 ```
@@ -55,8 +55,27 @@ billboard <- billboard |>
   mutate(
     Year = as.integer(format(Date, '4-Aug-58':'11-Jan-25')),
     Decade = Year - (Year)
-  )
+  ) # not working
 ```
+```{r}
+# working!!!!
+library(dplyr)
+
+billboard <- billboard %>%
+  mutate(
+    # grab the last two characters of the Date string (e.g., "58", "60")
+    year_2 = as.integer(substr(Date, nchar(Date) - 1, nchar(Date))),
+    # turn 58 -> 50, 60 -> 60, then make "50s", "60s"
+    Decade = paste0(floor(year_2 / 10) * 10, "s")
+  )
+head(billboard)
+
+billboard_simple <- billboard |>
+  select(Song, Artist, Date, `Weeks at Number One`, Decade) |>
+  arrange(Date)
+   
+```
+
 #I hit a massive wall at this point and can't figure out where to go from here
 
 #Analysis

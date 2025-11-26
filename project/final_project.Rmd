@@ -76,12 +76,39 @@ billboard_simple <- billboard |>
    
 ```
 
-#I hit a massive wall at this point and can't figure out where to go from here
+#Trying to fix decades
+
+```{r}
+library(lubridate)
+
+billboard <- billboard %>%
+  mutate(
+    Date_fixed = dmy(Date)   # day-month-year format (important!)
+  )
+billboard <- billboard %>%
+  mutate(
+    Year = year(Date_fixed),
+    Year = if_else(Year > 2024, Year - 100, Year)
+  )
+billboard <- billboard %>%
+  mutate(
+    Decade = paste0(floor(Year / 10) * 10, "s")
+  )
+
+#verifying it worked
+
+table(billboard$Decade)
+
+
+```
+
 
 #Analysis
 
 This data contains all Billboard Hot 100 No.1 hits since 1958. 
 The columns that I specifically want for this project is Song, Artist, Date and Weeks at Number One. I would like to make another column as well denoting what decade the songs are from to consolidate the data better.
+
+#PART 2
 
 Hypotheses:
 
@@ -89,6 +116,105 @@ Null hypothesis: One-hit wonder songs and multi-hit songs have the same average 
 
 Alternative Hypothesis: One-hit wonder songs spend a different average number of weeks at No.1
 
-#Can't go much further than this since I can't figure out the code above at this point. 
+```{r}
+billboard <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQVR7XE8UGPh9EYKpSLzrNA0kXqcQo3AONREuc6mAAaHAu-8ia01STi_HrHgATfgJ5n9xUAUHPSl9ou/pub?gid=1077686609&single=true&output=csv") |>  clean_names() |>  mutate(date_new = dmy(date)) |>  mutate(date_new = if_else(year(date_new) > 2024,                             date_new - years(100),                             date_new)) |>  select(date_new, everything())
+#not working, trying something different
+```
 
+```{r}
+one_hit_artists <- billboard %>%
+  count(Artist) %>%
+  filter(n == 1)
+
+billboard <- billboard %>%
+  mutate(
+    is_one_hit = Artist %in% one_hit_artists$Artist
+  )
+
+```
+#z-score test attempt
+
+#calculating for weeks spent at no.1
+```{r}
+billboard <- billboard %>%
+  mutate(
+    z_weeks = scale(`Weeks at Number One`, center = TRUE, scale = TRUE)
+  )
+```
+#identifying which songs are outliers
+```{r}
+billboard %>%
+  filter(abs(z_weeks) > 2) %>%
+  select(Song, Artist, `Weeks at Number One`, z_weeks)
+
+```
+#z score test
+
+```{r}
+# 1. Population mean and SD (all No.1 songs)
+pop_mean <- mean(billboard$`Weeks at Number One`, na.rm = TRUE)
+pop_sd   <- sd(billboard$`Weeks at Number One`, na.rm = TRUE)
+
+# 2. Sample: one-hit wonders only
+one_hit_sample <- billboard %>%
+  filter(is_one_hit == TRUE) %>%
+  pull(`Weeks at Number One`)
+
+sample_mean <- mean(one_hit_sample, na.rm = TRUE)
+sample_n    <- length(one_hit_sample)
+
+# 3. Z-test statistic
+z_stat <- (sample_mean - pop_mean) / (pop_sd / sqrt(sample_n))
+z_stat
+
+# 4. Two-tailed p-value
+p_value <- 2 * (1 - pnorm(abs(z_stat)))
+p_value
+
+#labeling stuff
+
+cat("Z-score:", z_stat, "\n")
+cat("p-value:", p_value, "\n")
+
+
+```
+#ANALYSIS
+
+The z-score test I conducted compared one-hit wonder songs to all No.1 hit songs. The z-score was 0.49 and the p-value was 0.62. Since the p-value is larger than 0.05, there isn't a significant difference between average weeks at No.1 and the entirety of all No.1 songs.
+
+#ANOVA test attempt
+
+#Hypotheses
+
+Null Hypothesis: The mean number of weeks spent at No.1 is the same across all decades.
+
+Alternative Hypothesis: At least one decade has a different average number of weeks spent at No.1.
+
+```{r}
+anova_result <- aov(`Weeks at Number One` ~ Decade, data = billboard)
+summary(anova_result)
+
+```
+#ANOVA Analysis
+
+This ANOVA test showed if songs from different decades stay at No.1 for a longer or shorter amount of time. The results of the test were statistically significant since the p-value is basically 0, much less than 0.05.
+
+#bar chart of no.1 hits by decade
+
+```{r}
+billboard %>%
+  count(Decade) %>%
+  ggplot(aes(x = Decade, y = n)) +
+  geom_col(fill = "navyblue") +
+  labs(
+    title = "Number of Billboard Hot 100 No.1 Hits per Decade",
+    x = "Decade",
+    y = "Number of No.1 Hits"
+  ) +
+  theme_minimal()
+
+```
+#Analysis of Graph
+
+The bar chart above shows that the majority of No.1 songs were made in the 1960s-1980s with a significant drop in the 1990s. I believe the next step is to figure out why there was a sharp drop in the 1990s with a steady decline into the 2010s. Perhaps tv or streaming played a part in this? 
 
